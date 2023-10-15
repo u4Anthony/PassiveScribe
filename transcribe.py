@@ -25,6 +25,7 @@ def transcribe(input_path, output_path, device_type, is_directory):
                     
                     # move successfully transcribed file to completed directory
                     move_completed(input_path, output_path, filename)
+                    
                 except Exception as e:
                     # TODO log the exception error
                     logger.exception(e)
@@ -44,8 +45,8 @@ def transcribe(input_path, output_path, device_type, is_directory):
                 move_transcription(output_path, filename, transcription_text)
 
                 # move successfully transcribed file to completed directory
-
                 move_completed(path, output_path, filename)
+
             except Exception as e:
                 # TODO log the exception error
                 logger.exception(e)
