@@ -34,3 +34,7 @@ venv.bak/
 
 # MacOS Specific
 .DS_Store
+
+# Project specific
+RevInput/
+RevOutput/
