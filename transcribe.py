@@ -46,7 +46,7 @@ def transcribe(input_path, output_path, device_type, is_directory):
 
                 # move successfully transcribed file to completed directory
                 move_completed(path, output_path, filename)
-
+                
             except Exception as e:
                 # TODO log the exception error
                 logger.exception(e)
@@ -78,10 +78,10 @@ def create_transcription(input, device_type):
     # mel = whisper.log_mel_spectrogram(audio).to(model.device)
     # for some reason the spectrogram does not work properly in the transcribe() function
     if device_type == 'cuda':
-        transcription_text = model.transcribe(audio=audio, language=language, without_timestamps=True)
+        transcription_text = model.transcribe(audio=audio, language=language, without_timestamps=False)
     else:
         try:
-            transcription_text = model.transcribe(audio=audio, language=language, without_timestamps=True, fp16=False)
+            transcription_text = model.transcribe(audio=audio, language=language, without_timestamps=False, fp16=False)
         except Exception as e:
             logger.exception(e)
     return transcription_text['text']

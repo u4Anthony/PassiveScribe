@@ -6,9 +6,10 @@ from transcribe import transcribe
 def device_check():
     if torch.cuda.is_available():
         device_type = 'cuda'
-        print(f'GPU Acceleration available, utilizing cuda as Whisper device type.')
+        print(f'GPU Acceleration available, Whisper device type set to CUDA.')
     else:
         device_type = 'cpu'
+        print(f'Whisper device type set to CPU')
     return device_type
 
 def callback(input_path, output_path, device_type, is_directory):
