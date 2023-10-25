@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-import os
 import logging
+import os
+import subprocess
 import whisper
 from whisper.utils import get_writer
 
@@ -11,6 +12,7 @@ from constants import (
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# Main transcription function
 def transcribe(input_path, output_path, device_type, is_directory):
     if is_directory:
         for filename in os.listdir(input_path):
@@ -27,7 +29,7 @@ def transcribe(input_path, output_path, device_type, is_directory):
                     move_completed(input_path, output_path, filename)
 
                 except Exception as e:
-                    # TODO log the exception error
+                    # TODO log the exception error to file
                     logger.exception(e)
             else:
                 move_unsupported(input_path, output_path, filename)
@@ -48,10 +50,21 @@ def transcribe(input_path, output_path, device_type, is_directory):
                 move_completed(path, output_path, filename)
                 
             except Exception as e:
-                # TODO log the exception error
+                # TODO log the exception error to file
                 logger.exception(e)
         else:
             move_unsupported(path, output_path, filename)
+
+# Transcription functions parts
+def convert_video_to_audio(input):
+    try:
+        audio_file_path = os.path.splitext(input)[0] + "_audio.wav"
+        command = f'ffmpeg -i \"{input}\" -vn -ar 44100 -ac 2 -b:a 192k \"{audio_file_path}\"'
+        subprocess.call(command, shell=True)
+        return audio_file_path
+    except Exception as e:
+        # TODO log the exceptiopn error to file
+        logger.exception(e)
 
 def language_check(audio):
     model = whisper.load_model("base")
@@ -73,7 +86,7 @@ def choose_model(audio, device_type):
     return model, language
 
 def create_transcription(input, device_type):
-    audio = whisper.load_audio(input)
+    audio = convert_video_to_audio(input)
     model, language = choose_model(audio, device_type)
     # mel = whisper.log_mel_spectrogram(audio).to(model.device)
     # for some reason the spectrogram does not work properly in the transcribe() function
@@ -84,8 +97,9 @@ def create_transcription(input, device_type):
             transcription_text = model.transcribe(audio=audio, language=language, without_timestamps=False, fp16=False)
         except Exception as e:
             logger.exception(e)
-    return transcription_text['text']
+    return transcription_text['text'], transcription_text['segments']
 
+# File Movement Functions
 def move_transcription(output_path, filename, transcription_text):
     filename = os.path.splitext(filename)[0]
 
