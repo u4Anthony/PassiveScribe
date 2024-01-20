@@ -35,7 +35,7 @@ Download Video -> Pull Audio from Video -> Pipe Video through AI/program that wi
 * Open an Anaconda Prompt (Miniconda 3) command line program
 * Run `conda activate passivescribe` to access the PassiveScribe environment.  If this does not work, refer back to the "Installing Miniconda" instructions, otherwise continue to the next step.
 * If not already there, navigate to the PassiveScribe directory. If you do not already have the PassiveScribe project cloned onto your local machine, refer back to the "Cloning PassiveScribe" section before continuing. 
-* Once in the PassiveScribe directory, run `python -m pip install requirements.txt`
+* Once in the PassiveScribe directory, run `python -m pip install -r requirements.txt`
 
 ### Maintaining and Auditing the Dependency List
 * To check for outdated dependency versions:
