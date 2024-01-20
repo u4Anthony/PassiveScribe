@@ -58,12 +58,13 @@ def transcribe(input_path, output_path, device_type, is_directory):
 # Transcription functions parts
 def convert_video_to_audio(input):
     try:
-        audio_file_path = os.path.splitext(input)[0] + "_audio.wav"
+        audio_file_path = f'./Audio/{os.path.basename(input)}_audio.wav'
         command = f'ffmpeg -i \"{input}\" -vn -ar 44100 -ac 2 -b:a 192k \"{audio_file_path}\"'
         subprocess.call(command, shell=True)
         return audio_file_path
     except Exception as e:
         # TODO log the exceptiopn error to file
+        print(f'DEBUG - {audio_file_path}')
         logger.exception(e)
 
 def language_check(audio):

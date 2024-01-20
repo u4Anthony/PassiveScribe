@@ -21,6 +21,7 @@ def dir_init():
     print('Checking if RevInput directory exists...')
     if not os.path.exists('./RevInput'):
         os.makedirs('./RevInput')
+        os.makedirs('./Audio')
         print('Created RevInput directory')
     else:
         print('RevInput already available for use')
