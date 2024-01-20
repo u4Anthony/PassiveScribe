@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import logging
 import os
+import re
 import subprocess
 import whisper
 from whisper.utils import get_writer
@@ -107,9 +108,14 @@ def move_transcription(output_path, filename, transcription_text):
     filename = os.path.splitext(filename)[0]
 
     print(f'Saving transcription to {filename}_transcript.txt in {output_path}/TranscriptOutput directory...')
-    with open(f'{output_path}/TranscriptOutput/{filename}_transcript.txt', 'w', encoding='utf-8') as transcript_file:
-        logging.debug(transcription_text)
-        transcript_file.write(transcription_text[0])
+    with open(f'{output_path}/TranscriptOutput/{filename}_transcript.vtt', 'w', encoding='utf-8') as transcript_file:
+        transcript_file.write(f'WEBVTT \n\n') # the space after webvtt is REQUIRED
+        # logging.debug(transcription_text)
+        for item in transcription_text[1]:
+            start = format_time(item.get('start'))
+            end = format_time(item.get('end'))
+            transcript_file.write(f'{start} --> {end}\n')
+            transcript_file.write(f'- {item.get("text").lstrip()}\n\n')
 
 def move_completed(input_path, output_path, filename):
     print(f'Attempting to move {filename} to {output_path}/CompletedFiles directory...')
@@ -122,3 +128,17 @@ def move_unsupported(input_path, output_path, filename):
     print(f'Attempting to move {filename} to {output_path}/UnsupportedFiles directory...')
     os.rename(f'{input_path}/{filename}', f'{output_path}/UnsupportedFiles/{filename}')
     print(f'Successfully moved file {filename}')
+
+def format_time(time):
+    # desired format 00:00:00.000
+    # hh:mm:ss.zzz
+    time = float(time)
+    if time == 0.0:
+        formatted_time = '00:00:00.000'
+    else:
+        minutes = time // 60
+        hours = time // 3600
+        seconds = time - (minutes * 60)
+        formatted_time = "{:02}:{:02}:{:06.3f}".format(int(hours), int(minutes), seconds)
+
+    return formatted_time
