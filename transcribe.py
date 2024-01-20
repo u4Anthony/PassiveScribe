@@ -58,13 +58,13 @@ def transcribe(input_path, output_path, device_type, is_directory):
 # Transcription functions parts
 def convert_video_to_audio(input):
     try:
-        audio_file_path = f'./Audio/{os.path.basename(input)}_audio.wav'
+        input_file_name = os.path.splitext(input)[0].replace('./RevInput\\', '')
+        audio_file_path = f'./Audio/{input_file_name}.wav'
         command = f'ffmpeg -i \"{input}\" -vn -ar 44100 -ac 2 -b:a 192k \"{audio_file_path}\"'
         subprocess.call(command, shell=True)
         return audio_file_path
     except Exception as e:
         # TODO log the exceptiopn error to file
-        print(f'DEBUG - {audio_file_path}')
         logger.exception(e)
 
 def language_check(audio):
@@ -87,7 +87,9 @@ def choose_model(audio, device_type):
     return model, language
 
 def create_transcription(input, device_type):
-    audio = convert_video_to_audio(input)
+    audio_path = convert_video_to_audio(input)
+    audio = whisper.load_audio(audio_path)
+    logging.debug(f'DEBUG - {audio}')
     model, language = choose_model(audio, device_type)
     # mel = whisper.log_mel_spectrogram(audio).to(model.device)
     # for some reason the spectrogram does not work properly in the transcribe() function
@@ -106,7 +108,8 @@ def move_transcription(output_path, filename, transcription_text):
 
     print(f'Saving transcription to {filename}_transcript.txt in {output_path}/TranscriptOutput directory...')
     with open(f'{output_path}/TranscriptOutput/{filename}_transcript.txt', 'w', encoding='utf-8') as transcript_file:
-        transcript_file.write(transcription_text)
+        logging.debug(transcription_text)
+        transcript_file.write(transcription_text[0])
 
 def move_completed(input_path, output_path, filename):
     print(f'Attempting to move {filename} to {output_path}/CompletedFiles directory...')
